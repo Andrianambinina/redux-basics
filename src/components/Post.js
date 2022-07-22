@@ -1,38 +1,39 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { editPost, deletePost } from "../actions/post.action";
+import { useDispatch } from "react-redux";
+import { deletePost, editPost } from "../actions/post.action";
 import Like from "./Like";
-import { isEmpty } from "./Utils";
 
 const Post = ({ post }) => {
-    const [editToggle, setEditToogle] = useState(false);
-    const user = useSelector((state) => state.userReducer);
+    const [editToggle, setEditToggle] = useState(false);
     const [editContent, setEditContent] = useState(post.content);
     const dispatch = useDispatch();
 
-    const handelEdit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-
-        const postData = {
+        const data = {
             title: post.title,
-            author: user[0].pseudo,
             content: editContent,
+            author: post.author,
             likes: post.likes,
             id: post.id
         };
 
-        dispatch(editPost(postData));
-        setEditToogle(false);
-    }
+        dispatch(editPost(data));
+        setEditToggle(false);
+    };
+
+    const handleDelete = () => {
+        dispatch(deletePost(post.id));
+    };
 
     return (
         <div className="post">
-            {!isEmpty(user[0]) && user[0].pseudo === post.author && (
-                <div className="edit-delete">
-                    <img onClick={() => setEditToogle(!editToggle)} src="./icons/edit.svg" alt="edit" />
-                    <img onClick={() => dispatch(deletePost(post.id))} src="./icons/delete.svg" alt="delete" />
-                </div>
-            )}
+
+            <div className="edit-delete">
+                <img src="./icons/edit.svg" alt="edit" onClick={() => setEditToggle(!editToggle)} />
+                <img src="./icons/delete.svg" alt="delete" onClick={() => handleDelete()} />
+            </div>
+
             <h2>{post.title}</h2>
             <img
                 src="https://picsum.photos/1500/400"
@@ -41,7 +42,7 @@ const Post = ({ post }) => {
             />
 
             {editToggle ? (
-                <form onSubmit={(e) => handelEdit(e)}> 
+                <form onSubmit={(e) => handleSubmit(e)}>
                     <textarea defaultValue={post.content} onChange={(e) => setEditContent(e.target.value)}></textarea>
                     <input type="submit" value="Valider" />
                 </form>
